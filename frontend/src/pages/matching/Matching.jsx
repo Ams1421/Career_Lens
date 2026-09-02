@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   FiCheckCircle,
@@ -20,6 +20,7 @@ import useAuth from "../../hooks/useAuth";
 export default function Matching() {
   const { logout } = useAuth();
   const navigate = useNavigate();
+  const { jobId } = useParams();
   const [collapsed, setCollapsed] = useState(false);
   const [profile, setProfile] = useState(null);
 
@@ -31,9 +32,6 @@ export default function Matching() {
     logout();
     navigate("/", { replace: true });
   }, [logout, navigate]);
-
-  // CareerLens demo job
-  const jobId = "01a02561-2159-7be0-9fe8-86d73e1751e7";
 
   const loadData = useCallback(async () => {
     try {

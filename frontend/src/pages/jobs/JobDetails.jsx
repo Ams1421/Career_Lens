@@ -126,12 +126,21 @@ export default function JobDetails() {
                 </p>
               </div>
 
-              <button
-                onClick={() => alert("Application submitted successfully.")}
-                className="bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 text-white px-6 sm:px-8 py-3.5 rounded-xl font-bold text-sm shadow-[0_10px_35px_rgba(139,92,246,.45)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 cursor-pointer shrink-0"
-              >
-                Apply Now
-              </button>
+              <div className="flex gap-3 shrink-0">
+                <button
+                  onClick={() => navigate(`/matching/${id}`)}
+                  className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white px-6 py-3.5 rounded-xl font-bold text-sm shadow-[0_10px_35px_rgba(99,102,241,.45)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
+                >
+                  AI Match
+                </button>
+
+                <button
+                  onClick={() => alert("Application submitted successfully.")}
+                  className="bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 text-white px-6 py-3.5 rounded-xl font-bold text-sm shadow-[0_10px_35px_rgba(139,92,246,.45)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
+                >
+                  Apply Now
+                </button>
+              </div>
             </div>
 
             <div className="flex flex-wrap gap-3 sm:gap-6 text-slate-300 text-xs sm:text-sm pt-4 border-t border-slate-800/80 pb-4">
