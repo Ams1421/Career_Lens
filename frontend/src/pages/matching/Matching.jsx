@@ -19,8 +19,8 @@ import useAuth from "../../hooks/useAuth";
 
 export default function Matching() {
   const { logout } = useAuth();
-  const navigate = useNavigate();
   const { jobId } = useParams();
+  const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
   const [profile, setProfile] = useState(null);
 
@@ -35,28 +35,30 @@ export default function Matching() {
 
   const loadData = useCallback(async () => {
     try {
-      const [profileRes, topJobsRes] = await Promise.all([
-        dashboardApi.getProfile(),
-        careerApi.getTopJobs(),
-      ]);
+      const profileRes = await dashboardApi.getProfile();
+      const jobsRes = await careerApi.getTopJobs();
 
+      const jobs = jobsRes.data || [];
       setProfile(profileRes.data);
-      setTopJobs(topJobsRes.data || []);
+      setTopJobs(jobs);
 
-      if (topJobsRes.data?.length > 0) {
-        const selectedJobId = jobId || topJobsRes.data[0].id;
-        const matchRes = await matchingApi.getJobMatch(selectedJobId);
-        setMatch(matchRes.data);
-      } else {
-        setMatch(null);
+      if (jobs.length === 0) {
+        setLoading(false);
+        return;
       }
+
+      const selectedJobId = jobId || jobs[0].id;
+
+      const matchRes = await matchingApi.getJobMatch(selectedJobId);
+
+      setMatch(matchRes.data);
     } catch (error) {
       if (error.response?.status === 401) {
         handleLogout();
         return;
       }
 
-      console.error("Failed to load match", error);
+      console.error("Matching error:", error);
     } finally {
       setLoading(false);
     }
@@ -77,10 +79,10 @@ export default function Matching() {
       </div>
     );
   }
-  if (!match) {
+  if (!match && !loading) {
     return (
-      <div className="min-h-screen bg-[#030712] flex items-center justify-center text-slate-300">
-        Unable to load match.
+      <div className="min-h-screen bg-[#030712] text-white flex items-center justify-center">
+        No matching result available.
       </div>
     );
   }
@@ -266,7 +268,9 @@ export default function Matching() {
 
                     <div className="flex items-center gap-3 shrink-0">
                       <span className="text-emerald-400 font-extrabold text-sm sm:text-base">
-                        {job.matchPercentage ?? "--"}%
+                        {job.id === (jobId || topJobs[0]?.id)
+                          ? `${matchPercent}%`
+                          : "View"}
                       </span>
                       <FiArrowRight className="text-slate-500" />
                     </div>
