@@ -42,8 +42,27 @@ export default function Matching() {
 
       // Load all jobs for the right-side list
       const jobsRes = await jobsApi.getJobs();
-      const jobs = jobsRes.data || [];
-      setTopJobs(jobs);
+const jobs = jobsRes.data || [];
+
+const jobsWithMatch = await Promise.all(
+  jobs.map(async (job) => {
+    try {
+      const res = await matchingApi.getJobMatch(job.id);
+
+      return {
+        ...job,
+        matchPercentage: Math.round(res.data.matchPercentage ?? 0),
+      };
+    } catch {
+      return {
+        ...job,
+        matchPercentage: 0,
+      };
+    }
+  })
+);
+
+setTopJobs(jobsWithMatch);
 
       if (jobs.length === 0) {
         setMatch(null);
@@ -332,9 +351,7 @@ export default function Matching() {
                             : "text-slate-300"
                         }`}
                       >
-                        {job.id === (jobId || topJobs[0]?.id)
-                          ? `${matchPercent}%`
-                          : `${Math.max(15, Math.round(matchPercent - 20 - topJobs.indexOf(job) * 10))}%`}
+                        {job.matchPercentage}%
                       </span>
                       <FiArrowRight className="text-slate-500" />
                     </div>
