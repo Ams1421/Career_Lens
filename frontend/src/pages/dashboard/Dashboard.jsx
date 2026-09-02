@@ -61,7 +61,7 @@ export default function Dashboard() {
   const [resume, setResume] = useState(null);
   const [careerRecommendations, setCareerRecommendations] = useState([]);
   const [roadmap, setRoadmap] = useState(null);
-  const [topJobs, setTopJobs] = useState([]);
+  const [topJobs] = useState([]);
 
   const [stats, setStats] = useState({
     skills: 0,
@@ -109,22 +109,40 @@ export default function Dashboard() {
 
       // Top Jobs
       const jobs = topJobsRes.data || [];
-      setTopJobs(jobs);
 
       if (jobs.length > 0) {
         try {
-          const matchRes = await matchingApi.getJobMatch(jobs[0].id);
+          // Get match result for every recommended job
+          const matchResults = await Promise.allSettled(
+            jobs.map((job) => matchingApi.getJobMatch(job.id)),
+          );
 
-          setMatchData(matchRes.data);
-          setMatchScore(Math.round(matchRes.data.matchPercentage ?? 0));
+          const validMatches = matchResults
+            .filter((result) => result.status === "fulfilled")
+            .map((result) => result.value.data);
+
+          if (validMatches.length > 0) {
+            // Pick the job with the highest match percentage
+            const bestMatch = validMatches.reduce((best, current) =>
+              (current.matchPercentage ?? 0) > (best.matchPercentage ?? 0)
+                ? current
+                : best,
+            );
+
+            setMatchScore(Math.round(bestMatch.matchPercentage ?? 0));
+            setMatchData(bestMatch);
+          } else {
+            setMatchScore(0);
+            setMatchData(null);
+          }
         } catch (error) {
           console.error("Failed to load match score:", error);
-          setMatchData(null);
           setMatchScore(0);
+          setMatchData(null);
         }
       } else {
-        setMatchData(null);
         setMatchScore(0);
+        setMatchData(null);
       }
 
       // Profile
