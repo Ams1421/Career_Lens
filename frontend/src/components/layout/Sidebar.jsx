@@ -32,7 +32,7 @@ export default function Sidebar({ collapsed, setCollapsed }) {
         { icon: <FiFileText />, label: "Resume", path: "/resume" },
         { icon: <FiBriefcase />, label: "Browse Jobs", path: "/jobs" },
         { icon: <FiFileText />, label: "Applications", path: "/applications" },
-        { icon: <FiTarget />, label: "AI Match", path: "/jobs" },
+        { icon: <FiTarget />, label: "AI Match", path: "/matching" },
       ],
     },
     {
