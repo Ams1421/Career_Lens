@@ -35,15 +35,21 @@ export default function Matching() {
 
   const loadData = useCallback(async () => {
     try {
-      const [response, profileRes, topJobsRes] = await Promise.all([
-        matchingApi.getJobMatch(jobId),
+      const [profileRes, topJobsRes] = await Promise.all([
         dashboardApi.getProfile(),
         careerApi.getTopJobs(),
       ]);
 
-      setMatch(response.data);
       setProfile(profileRes.data);
       setTopJobs(topJobsRes.data || []);
+
+      if (topJobsRes.data?.length > 0) {
+        const selectedJobId = jobId || topJobsRes.data[0].id;
+        const matchRes = await matchingApi.getJobMatch(selectedJobId);
+        setMatch(matchRes.data);
+      } else {
+        setMatch(null);
+      }
     } catch (error) {
       if (error.response?.status === 401) {
         handleLogout();
@@ -54,15 +60,15 @@ export default function Matching() {
     } finally {
       setLoading(false);
     }
-  }, [jobId, handleLogout]);
+  }, [handleLogout, jobId]);
 
   useEffect(() => {
-  const id = requestAnimationFrame(() => {
-    void loadData();
-  });
+    const id = requestAnimationFrame(() => {
+      void loadData();
+    });
 
-  return () => cancelAnimationFrame(id);
-}, [loadData]);
+    return () => cancelAnimationFrame(id);
+  }, [loadData]);
 
   if (loading) {
     return (
@@ -79,7 +85,7 @@ export default function Matching() {
     );
   }
 
-  const matchPercent = Math.round(match.matchPercentage || 84);
+  const matchPercent = Math.round(match.matchPercentage ?? 0);
   const circumference = 314; // 2 * pi * r (r=50)
   const strokeDashoffset = circumference - (circumference * matchPercent) / 100;
 
@@ -192,7 +198,7 @@ export default function Matching() {
                 {/* Inner Percentage Display */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <span className="text-4xl sm:text-5xl font-black text-white tracking-tight drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
-                    {topJobs[0]?.matchPercentage || matchPercent}%
+                    {matchPercent}%
                   </span>
                   <span className="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">
                     OVERALL MATCH
@@ -228,74 +234,44 @@ export default function Matching() {
               </div>
 
               <div className="space-y-4">
-                <div className="bg-slate-900/60 border border-purple-500/40 rounded-2xl p-4 flex items-center justify-between hover:border-purple-500/70 transition gap-4">
-                  <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center font-bold text-white text-xs shadow shrink-0">
-                      FS
-                    </div>
-                    <div className="min-w-0">
-                      <h4 className="font-bold text-white text-sm truncate">
-                        {topJobs[0]?.title || "Full Stack Developer"}
-                      </h4>
-                      <p className="text-slate-400 text-xs mt-0.5 flex items-center gap-2 flex-wrap">
-                        <span>AI Career Match</span> • <span>Remote</span> •{" "}
-                        <span>Full Time</span>
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 shrink-0">
-                    <span className="text-emerald-400 font-extrabold text-sm sm:text-base">
-                      {topJobs[0]?.matchPercentage || matchPercent}%
-                    </span>
-                    <FiArrowRight className="text-slate-500" />
-                  </div>
-                </div>
+                {topJobs.map((job) => (
+                  <div
+                    key={job.id}
+                    onClick={async () => {
+                      const res = await matchingApi.getJobMatch(job.id);
+                      setMatch(res.data);
+                      navigate(`/matching/${job.id}`);
+                    }}
+                    className="cursor-pointer bg-slate-900/60 border border-slate-800 rounded-2xl p-4 flex items-center justify-between hover:border-purple-500/40 transition gap-4"
+                  >
+                    <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-purple-600 to-blue-600 flex items-center justify-center font-bold text-white text-xs shadow shrink-0">
+                        {job.title.substring(0, 2).toUpperCase()}
+                      </div>
 
-                <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 flex items-center justify-between hover:border-purple-500/40 transition gap-4">
-                  <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-purple-600 to-pink-600 flex items-center justify-center font-bold text-white text-xs shadow shrink-0">
-                      RD
-                    </div>
-                    <div className="min-w-0">
-                      <h4 className="font-bold text-white text-sm truncate">
-                        React Developer
-                      </h4>
-                      <p className="text-slate-400 text-xs mt-0.5 flex items-center gap-2 flex-wrap truncate">
-                        <span>Infosys • Bengaluru</span> •{" "}
-                        <span>Bengaluru</span> • <span>Full Time</span>
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 shrink-0">
-                    <span className="text-amber-400 font-extrabold text-sm sm:text-base">
-                      25.00%
-                    </span>
-                    <FiArrowRight className="text-slate-500" />
-                  </div>
-                </div>
+                      <div className="min-w-0">
+                        <h4 className="font-bold text-white text-sm truncate">
+                          {job.title}
+                        </h4>
 
-                <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 flex items-center justify-between hover:border-purple-500/40 transition gap-4">
-                  <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-600 flex items-center justify-center font-bold text-white text-xs shadow shrink-0">
-                      .NET
+                        <p className="text-slate-400 text-xs mt-0.5 flex items-center gap-2 flex-wrap truncate">
+                          <span>{job.companyName}</span> •{" "}
+                          <span>{job.location}</span> •{" "}
+                          <span>
+                            {job.workMode || job.employmentType || "Full Time"}
+                          </span>
+                        </p>
+                      </div>
                     </div>
-                    <div className="min-w-0">
-                      <h4 className="font-bold text-white text-sm truncate">
-                        .NET Developer
-                      </h4>
-                      <p className="text-slate-400 text-xs mt-0.5 flex items-center gap-2 flex-wrap truncate">
-                        <span>TCS • Hyderabad</span> • <span>Hyderabad</span> •{" "}
-                        <span>Full Time</span>
-                      </p>
+
+                    <div className="flex items-center gap-3 shrink-0">
+                      <span className="text-emerald-400 font-extrabold text-sm sm:text-base">
+                        {job.matchPercentage ?? "--"}%
+                      </span>
+                      <FiArrowRight className="text-slate-500" />
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 shrink-0">
-                    <span className="text-blue-400 font-extrabold text-sm sm:text-base">
-                      20.00%
-                    </span>
-                    <FiArrowRight className="text-slate-500" />
-                  </div>
-                </div>
+                ))}
               </div>
             </motion.div>
           </div>
@@ -315,7 +291,7 @@ export default function Matching() {
                   </div>
                 </div>
                 <div className="text-3xl sm:text-4xl font-black text-white mb-1">
-                  {match.matchedSkills?.length || 1}
+                  {match.matchedSkills?.length ?? 0}
                 </div>
                 <p className="text-xs text-slate-400">
                   skill matches your target role
@@ -329,7 +305,7 @@ export default function Matching() {
               </div>
 
               <div className="flex flex-wrap gap-2 pt-4 border-t border-slate-800">
-                {(match.matchedSkills || [".NET"]).map((skill) => (
+                {(match.matchedSkills || []).map((skill) => (
                   <span
                     key={skill}
                     className="bg-emerald-950/70 border border-emerald-500/40 text-emerald-300 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5"
@@ -353,7 +329,7 @@ export default function Matching() {
                   </div>
                 </div>
                 <div className="text-3xl sm:text-4xl font-black text-white mb-1">
-                  {match.missingSkills?.length || 2}
+                  {match.missingSkills?.length ?? 0}
                 </div>
                 <p className="text-xs text-slate-400">
                   skills to improve your match
@@ -367,16 +343,14 @@ export default function Matching() {
               </div>
 
               <div className="flex flex-wrap gap-2 pt-4 border-t border-slate-800">
-                {(match.missingSkills || ["React", "PostgreSQL"]).map(
-                  (skill) => (
-                    <span
-                      key={skill}
-                      className="bg-orange-950/70 border border-orange-500/40 text-orange-300 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5"
-                    >
-                      {skill}
-                    </span>
-                  ),
-                )}
+                {(match.missingSkills || []).map((skill) => (
+                  <span
+                    key={skill}
+                    className="bg-orange-950/70 border border-orange-500/40 text-orange-300 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5"
+                  >
+                    {skill}
+                  </span>
+                ))}
               </div>
             </motion.div>
 
@@ -393,7 +367,7 @@ export default function Matching() {
                   </div>
                 </div>
                 <div className="text-3xl sm:text-4xl font-black text-white mb-1">
-                  {match.skillGap?.length || 2}
+                  {match.strongSkills?.length ?? 0}
                 </div>
                 <p className="text-xs text-slate-400">
                   strong skills increasing your match
@@ -407,9 +381,7 @@ export default function Matching() {
               </div>
 
               <div className="flex flex-wrap gap-2 pt-4 border-t border-slate-800">
-                {(
-                  match.skillGap?.map((g) => g.skill) || ["React", "PostgreSQL"]
-                ).map((skill) => (
+                {(match.strongSkills || []).map((skill) => (
                   <span
                     key={skill}
                     className="bg-blue-950/70 border border-blue-500/40 text-blue-300 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5"
