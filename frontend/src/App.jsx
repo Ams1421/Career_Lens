@@ -727,6 +727,16 @@ export default function App() {
         }
       />
 
+      {/* AI Match */}
+      <Route
+        path="/matching"
+        element={
+          <CandidateRoute>
+            <Matching />
+          </CandidateRoute>
+        }
+      />
+
       <Route
         path="/matching/:jobId"
         element={
