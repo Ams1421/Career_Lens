@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+@theme {
+  --color-darkBg: #030712;
+  --color-cardBg: #0b1021;
+  --color-cardHover: #111827;
+  --color-neonBlue: #3b82f6;
+  --color-neonPurple: #a855f7;
+  --color-neonCyan: #06b6d4;
+  --color-neonEmerald: #10b981;
+
+  --shadow-neon-glow: 0 0 20px rgba(168, 85, 247, 0.15);
+  --shadow-card-glow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+/* Sidebar Scrollbar */
+
+.sidebar-scroll::-webkit-scrollbar{
+  width:6px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb{
+  background:rgba(124,58,237,.4);
+  border-radius:999px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-track{
+  background:transparent;
+}
+
+@keyframes float {
+  0%,100%{
+    transform:translateY(0);
+  }
+  50%{
+    transform:translateY(-8px);
+  }
+}
+
+.animate-float{
+  animation:float 3s ease-in-out infinite;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-darkBg);
+    color: #f8fafc;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+}
+
+/* Custom scrollbar for futuristic look */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #030712;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}

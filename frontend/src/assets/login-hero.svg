@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 500" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="panelBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b1021" />
+      <stop offset="100%" stop-color="#030712" />
+    </linearGradient>
+
+    <!-- Neon Arch Gradient -->
+    <linearGradient id="neonArch" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#3b82f6" />
+      <stop offset="50%" stop-color="#a855f7" />
+      <stop offset="100%" stop-color="#ec4899" />
+    </linearGradient>
+
+    <!-- Glow Filter -->
+    <filter id="neonGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="10" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  {/* Card Base */}
+  <rect width="600" height="500" rx="28" fill="url(#panelBg)" />
+  <rect x="2" y="2" width="596" height="496" rx="26" fill="none" stroke="#334155" stroke-width="1.5" stroke-opacity="0.5" />
+
+  {/* Cyberpunk Perspective Floor Grid */}
+  <g opacity="0.2">
+    <path d="M 0 380 L 600 380 M 0 420 L 600 420 M 0 460 L 600 460" stroke="#a855f7" stroke-width="1" />
+    <path d="M 180 340 L 80 500 M 260 340 L 220 500 M 340 340 L 380 500 M 420 340 L 520 500" stroke="#3b82f6" stroke-width="1" />
+  </g>
+
+  {/* Neon Portal Gateway / Arch */}
+  <g transform="translate(300, 240)" filter="url(#neonGlow)">
+    <!-- Outer Glow Arch -->
+    <path d="M -70 110 L -70 20 C -70 -50 70 -50 70 20 L 70 110" fill="none" stroke="url(#neonArch)" stroke-width="4" stroke-linecap="round" />
+    <!-- Inner Portal Line -->
+    <path d="M -56 110 L -56 24 C -56 -35 56 -35 56 24 L 56 110" fill="none" stroke="#38bdf8" stroke-width="1.5" stroke-opacity="0.6" />
+    <!-- Portal Energy Floor Reflection -->
+    <ellipse cx="0" cy="110" rx="70" ry="12" fill="#a855f7" opacity="0.4" />
+  </g>
+
+  {/* Floating Holographic AI Core Data Nodes */}
+  <g transform="translate(140, 150)" filter="url(#neonGlow)">
+    <circle cx="0" cy="0" r="24" fill="#0b1021" stroke="#a855f7" stroke-width="2" />
+    <circle cx="0" cy="0" r="8" fill="#38bdf8" />
+    <line x1="-35" y1="0" x2="-24" y2="0" stroke="#38bdf8" stroke-width="2" />
+    <line x1="24" y1="0" x2="35" y2="0" stroke="#38bdf8" stroke-width="2" />
+  </g>
+
+  <g transform="translate(460, 180)" filter="url(#neonGlow)">
+    <circle cx="0" cy="0" r="18" fill="#0b1021" stroke="#ec4899" stroke-width="2" />
+    <circle cx="0" cy="0" r="6" fill="#a855f7" />
+  </g>
+
+  {/* Floating Analytics Bar Chart Widget */}
+  <g transform="translate(100, 310)" opacity="0.85">
+    <rect x="0" y="0" width="80" height="50" rx="8" fill="#0f172a" stroke="#475569" stroke-width="1" />
+    <rect x="12" y="26" width="10" height="16" rx="3" fill="#3b82f6" />
+    <rect x="28" y="16" width="10" height="26" rx="3" fill="#a855f7" />
+    <rect x="44" y="22" width="10" height="20" rx="3" fill="#10b981" />
+    <rect x="60" y="10" width="10" height="32" rx="3" fill="#ec4899" />
+  </g>
+</svg>

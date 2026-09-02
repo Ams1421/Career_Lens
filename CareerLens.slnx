@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/backend/">
+    <Project Path="backend/CareerLens.API/CareerLens.API.csproj" />
+    <Project Path="backend/CareerLens.Application/CareerLens.Application.csproj" />
+    <Project Path="backend/CareerLens.Domain/CareerLens.Domain.csproj" />
+    <Project Path="backend/CareerLens.Infrastructure/CareerLens.Infrastructure.csproj" />
+    <Project Path="backend/CareerLens.Persistence/CareerLens.Persistence.csproj" />
+    <Project Path="backend/CareerLens.Shared/CareerLens.Shared.csproj" />
+  </Folder>
+</Solution>

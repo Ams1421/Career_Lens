@@ -1,0 +1,23 @@
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# .NET
+**/bin/
+**/obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.*
+
+# OS
+Thumbs.db
+.DS_Store
