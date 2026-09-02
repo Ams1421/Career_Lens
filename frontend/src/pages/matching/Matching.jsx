@@ -43,6 +43,7 @@ export default function Matching() {
       setTopJobs(jobs);
 
       if (jobs.length === 0) {
+        setMatch(null);
         setLoading(false);
         return;
       }
@@ -76,6 +77,41 @@ export default function Matching() {
     return (
       <div className="min-h-screen bg-[#030712] flex items-center justify-center text-slate-300">
         Loading AI Match...
+      </div>
+    );
+  }
+
+  if (!match) {
+    return (
+      <div className="min-h-screen bg-[#030712] text-slate-100 font-sans relative overflow-x-hidden">
+        <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
+        <TopNavbar
+          profile={profile}
+          logout={handleLogout}
+          collapsed={collapsed}
+          setCollapsed={setCollapsed}
+        />
+
+        <main
+          className={`transition-all duration-300 ml-0 ${
+            collapsed ? "lg:ml-20" : "lg:ml-64"
+          } mt-20 sm:mt-24 p-6 flex items-center justify-center`}
+        >
+          <div className="bg-[#0B1021]/80 border border-purple-500/20 rounded-3xl p-10 text-center max-w-xl">
+            <FiAlertCircle className="mx-auto text-5xl text-orange-400 mb-4" />
+            <h2 className="text-2xl font-bold mb-2">No Match Available</h2>
+            <p className="text-slate-400 mb-6">
+              Select a job from Browse Jobs to calculate your AI Match score.
+            </p>
+
+            <button
+              onClick={() => navigate("/jobs")}
+              className="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold"
+            >
+              Browse Jobs
+            </button>
+          </div>
+        </main>
       </div>
     );
   }
@@ -237,8 +273,8 @@ export default function Matching() {
                         const res = await matchingApi.getJobMatch(job.id);
                         setMatch(res.data);
                         navigate(`/matching/${job.id}`);
-                      } catch (error) {
-                        console.error("Match failed:", error);
+                      } catch (err) {
+                        console.error("Match failed", err);
                       }
                     }}
                     className="cursor-pointer bg-slate-900/60 border border-slate-800 rounded-2xl p-4 flex items-center justify-between hover:border-purple-500/40 transition gap-4"
