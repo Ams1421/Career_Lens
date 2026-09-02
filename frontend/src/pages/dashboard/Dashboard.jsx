@@ -72,12 +72,10 @@ export default function Dashboard() {
   });
 
   const [recentApplications, setRecentApplications] = useState([]);
-  const [matchScore, setMatchScore] = useState(84);
+  const [matchScore, setMatchScore] = useState(0);
 
   const loadDashboard = useCallback(async () => {
     try {
-      const jobId = "01a02561-2159-7be0-9fe8-86d73e1751e7";
-
       const [
         profileRes,
         skillsRes,
@@ -88,7 +86,6 @@ export default function Dashboard() {
         roadmapRes,
         topJobsRes,
         resumeRes,
-        matchRes,
       ] = await Promise.all([
         dashboardApi.getProfile(),
         dashboardApi.getSkills(),
@@ -99,22 +96,38 @@ export default function Dashboard() {
         careerApi.getRoadmap(),
         careerApi.getTopJobs(),
         resumeApi.getMyResumes(),
-        matchingApi.getJobMatch(jobId),
       ]);
 
+      // Resume
       setResume(
         resumeRes.data?.find((r) => r.isPrimary) || resumeRes.data?.[0] || null,
       );
 
+      // Career data
       setCareerRecommendations(recommendationsRes.data || []);
       setRoadmap(roadmapRes.data || null);
-      setTopJobs(topJobsRes.data || []);
-      setProfile(profileRes.data);
 
-      if (matchRes?.data?.matchPercentage) {
-        setMatchScore(Math.round(matchRes.data.matchPercentage));
+      // Top Jobs
+      const jobs = topJobsRes.data || [];
+      setTopJobs(jobs);
+
+      // Dynamic AI Match Score (logged-in user's first recommended job)
+      if (jobs.length > 0) {
+        try {
+          const matchRes = await matchingApi.getJobMatch(jobs[0].id);
+          setMatchScore(Math.round(matchRes.data.matchPercentage ?? 0));
+        } catch (error) {
+          console.error("Failed to load match score:", error);
+          setMatchScore(0);
+        }
+      } else {
+        setMatchScore(0);
       }
 
+      // Profile
+      setProfile(profileRes.data);
+
+      // Dashboard Stats
       setStats({
         skills: skillsRes.data?.length ?? 0,
         education: educationRes.data?.length ?? 0,
@@ -122,6 +135,7 @@ export default function Dashboard() {
         applications: applicationsRes.data?.length ?? 0,
       });
 
+      // Recent Applications
       setRecentApplications((applicationsRes.data || []).slice(0, 5));
     } catch (error) {
       if (error.response?.status === 401) {
