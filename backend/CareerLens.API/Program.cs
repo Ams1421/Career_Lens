@@ -23,6 +23,7 @@ builder.Services.AddDbContext<CareerLensDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // CORS
+// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("ReactPolicy", policy =>
@@ -31,8 +32,9 @@ builder.Services.AddCors(options =>
                 "http://localhost:5173",
                 "https://localhost:5173",
                 "http://localhost",
-                "https://localhost",      // <-- ADD THIS
-                "capacitor://localhost"
+                "https://localhost",
+                "capacitor://localhost",
+                "https://careerlens-frontend-jeee.onrender.com"
             )
             .AllowAnyHeader()
             .AllowAnyMethod();
