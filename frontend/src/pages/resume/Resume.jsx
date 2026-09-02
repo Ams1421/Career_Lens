@@ -322,7 +322,7 @@ export default function Resume() {
 
                     <div className="flex items-center gap-3 w-full md:w-auto justify-end">
                       <a
-                        href={`http://localhost:5149${resume.fileUrl}`}
+                        href={`https://careerlens-api-7h4w.onrender.com${resume.fileUrl}`}
                         target="_blank"
                         rel="noreferrer"
                         className="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/40 text-blue-400 flex items-center justify-center hover:bg-blue-600 hover:text-white transition hover:scale-110"

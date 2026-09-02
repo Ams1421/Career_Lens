@@ -345,7 +345,7 @@ export default function Profile() {
                       form.profileImageUrl
                         ? form.profileImageUrl.startsWith("http")
                           ? form.profileImageUrl
-                          : `http://localhost:5149${form.profileImageUrl}`
+                          : `https://careerlens-api-7h4w.onrender.com${form.profileImageUrl}`
                         : `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=0b1021&color=fff&size=256`
                     }
                     alt="Profile"
@@ -570,7 +570,7 @@ export default function Profile() {
                         </div>
 
                         <a
-                          href={`http://localhost:5149${primaryResume.fileUrl}`}
+                          href={`https://careerlens-api-7h4w.onrender.com${primaryResume.fileUrl}`}
                           target="_blank"
                           rel="noreferrer"
                           className="flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-xl border border-purple-500/30 bg-purple-500/10 text-purple-300 hover:bg-purple-500/20 transition shrink-0"

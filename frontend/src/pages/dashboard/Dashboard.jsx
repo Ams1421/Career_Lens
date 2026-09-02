@@ -332,7 +332,7 @@ export default function Dashboard() {
                     profile?.profileImageUrl
                       ? profile.profileImageUrl.startsWith("http")
                         ? profile.profileImageUrl
-                        : `http://localhost:5149${profile.profileImageUrl}`
+                        : `https://careerlens-api-7h4w.onrender.com${profile.profileImageUrl}`
                       : `https://ui-avatars.com/api/?name=${encodeURIComponent(
                           `${profile?.firstName || "User"} ${
                             profile?.lastName || ""

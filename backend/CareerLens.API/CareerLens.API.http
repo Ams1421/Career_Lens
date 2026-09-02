@@ -1,4 +1,4 @@
-@CareerLens.API_HostAddress = http://localhost:5149
+@CareerLens.API_HostAddress = https://careerlens-api-7h4w.onrender.com
 
 GET {{CareerLens.API_HostAddress}}/weatherforecast/
 Accept: application/json
