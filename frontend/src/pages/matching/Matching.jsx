@@ -79,15 +79,8 @@ export default function Matching() {
       </div>
     );
   }
-  if (!match && !loading) {
-    return (
-      <div className="min-h-screen bg-[#030712] text-white flex items-center justify-center">
-        No matching result available.
-      </div>
-    );
-  }
 
-  const matchPercent = Math.round(match.matchPercentage ?? 0);
+  const matchPercent = Math.round(match?.matchPercentage ?? 0);
   const circumference = 314; // 2 * pi * r (r=50)
   const strokeDashoffset = circumference - (circumference * matchPercent) / 100;
 
@@ -240,9 +233,13 @@ export default function Matching() {
                   <div
                     key={job.id}
                     onClick={async () => {
-                      const res = await matchingApi.getJobMatch(job.id);
-                      setMatch(res.data);
-                      navigate(`/matching/${job.id}`);
+                      try {
+                        const res = await matchingApi.getJobMatch(job.id);
+                        setMatch(res.data);
+                        navigate(`/matching/${job.id}`);
+                      } catch (error) {
+                        console.error("Match failed:", error);
+                      }
                     }}
                     className="cursor-pointer bg-slate-900/60 border border-slate-800 rounded-2xl p-4 flex items-center justify-between hover:border-purple-500/40 transition gap-4"
                   >
