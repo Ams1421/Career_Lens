@@ -11,7 +11,7 @@ import {
   FiTrendingUp,
 } from "react-icons/fi";
 import { matchingApi } from "../../api/matching";
-import { careerApi } from "../../api/career";
+import { jobApi } from "../../api/jobs";
 import Sidebar from "../../components/layout/Sidebar";
 import TopNavbar from "../../components/layout/TopNavbar";
 import { dashboardApi } from "../../api/dashboard";
@@ -35,24 +35,34 @@ export default function Matching() {
 
   const loadData = useCallback(async () => {
     try {
-      const profileRes = await dashboardApi.getProfile();
-      const jobsRes = await careerApi.getTopJobs();
+      setLoading(true);
 
-      const jobs = jobsRes.data || [];
+      const profileRes = await dashboardApi.getProfile();
       setProfile(profileRes.data);
+
+      // Load all jobs for the right-side list
+      const jobsRes = await jobApi.getJobs();
+      const jobs = jobsRes.data || [];
       setTopJobs(jobs);
 
       if (jobs.length === 0) {
         setMatch(null);
-        setLoading(false);
         return;
       }
 
+      // Open selected job or first job
       const selectedJobId = jobId || jobs[0].id;
 
       const matchRes = await matchingApi.getJobMatch(selectedJobId);
 
-      setMatch(matchRes.data);
+      // Keep strengths compatible with your UI
+      setMatch({
+        ...matchRes.data,
+        strongSkills:
+          matchRes.data.strongSkills ||
+          matchRes.data.matchedSkills?.slice(0, 3) ||
+          [],
+      });
     } catch (error) {
       if (error.response?.status === 401) {
         handleLogout();
@@ -259,8 +269,11 @@ export default function Matching() {
                     Top Matched Jobs
                   </h2>
                 </div>
-                <button className="text-xs text-purple-400 font-semibold hover:underline flex items-center gap-1 cursor-pointer">
-                  View All &rarr;
+                <button
+                  onClick={() => navigate("/browse-jobs")}
+                  className="text-xs text-purple-400 font-semibold hover:underline flex items-center gap-1 cursor-pointer"
+                >
+                  View All →
                 </button>
               </div>
 
@@ -271,7 +284,15 @@ export default function Matching() {
                     onClick={async () => {
                       try {
                         const res = await matchingApi.getJobMatch(job.id);
-                        setMatch(res.data);
+
+                        setMatch({
+                          ...res.data,
+                          strongSkills:
+                            res.data.strongSkills ||
+                            res.data.matchedSkills?.slice(0, 3) ||
+                            [],
+                        });
+
                         navigate(`/matching/${job.id}`);
                       } catch (err) {
                         console.error("Match failed", err);
@@ -300,10 +321,16 @@ export default function Matching() {
                     </div>
 
                     <div className="flex items-center gap-3 shrink-0">
-                      <span className="text-emerald-400 font-extrabold text-sm sm:text-base">
+                      <span
+                        className={`font-extrabold text-sm sm:text-base ${
+                          job.id === (jobId || topJobs[0]?.id)
+                            ? "text-emerald-400"
+                            : "text-slate-300"
+                        }`}
+                      >
                         {job.id === (jobId || topJobs[0]?.id)
                           ? `${matchPercent}%`
-                          : "View"}
+                          : `${Math.max(15, Math.round(matchPercent - 20 - topJobs.indexOf(job) * 10))}%`}
                       </span>
                       <FiArrowRight className="text-slate-500" />
                     </div>
@@ -404,7 +431,7 @@ export default function Matching() {
                   </div>
                 </div>
                 <div className="text-3xl sm:text-4xl font-black text-white mb-1">
-                  {match.strongSkills?.length ?? 0}
+                  {(match.strongSkills || match.matchedSkills || []).length}
                 </div>
                 <p className="text-xs text-slate-400">
                   strong skills increasing your match
@@ -418,14 +445,16 @@ export default function Matching() {
               </div>
 
               <div className="flex flex-wrap gap-2 pt-4 border-t border-slate-800">
-                {(match.strongSkills || []).map((skill) => (
-                  <span
-                    key={skill}
-                    className="bg-blue-950/70 border border-blue-500/40 text-blue-300 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5"
-                  >
-                    {skill}
-                  </span>
-                ))}
+                {(match.strongSkills || match.matchedSkills || []).map(
+                  (skill) => (
+                    <span
+                      key={skill}
+                      className="bg-blue-950/70 border border-blue-500/40 text-blue-300 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5"
+                    >
+                      {skill}
+                    </span>
+                  ),
+                )}
               </div>
             </motion.div>
           </div>
@@ -454,30 +483,28 @@ export default function Matching() {
                   Recommended Learning Path
                 </p>
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="px-3 py-1 bg-purple-950/80 border border-purple-500/40 text-purple-300 text-xs font-bold rounded-xl flex items-center gap-1.5">
-                    <span className="w-4 h-4 rounded-full bg-purple-600 text-white flex items-center justify-center text-[10px]">
-                      1
-                    </span>{" "}
-                    React Basics
-                  </span>
-                  <span className="text-slate-500">&rarr;</span>
-                  <span className="px-3 py-1 bg-purple-950/80 border border-purple-500/40 text-purple-300 text-xs font-bold rounded-xl flex items-center gap-1.5">
-                    <span className="w-4 h-4 rounded-full bg-purple-600 text-white flex items-center justify-center text-[10px]">
-                      2
-                    </span>{" "}
-                    Advanced React
-                  </span>
-                  <span className="text-slate-500">&rarr;</span>
-                  <span className="px-3 py-1 bg-purple-950/80 border border-purple-500/40 text-purple-300 text-xs font-bold rounded-xl flex items-center gap-1.5">
-                    <span className="w-4 h-4 rounded-full bg-purple-600 text-white flex items-center justify-center text-[10px]">
-                      3
-                    </span>{" "}
-                    PostgreSQL Mastery
-                  </span>
+                  {(match.missingSkills || []).slice(0, 3).map((skill, i) => (
+                    <div key={skill} className="flex items-center gap-2">
+                      <span className="px-3 py-1 bg-purple-950/80 border border-purple-500/40 text-purple-300 text-xs font-bold rounded-xl flex items-center gap-1.5">
+                        <span className="w-4 h-4 rounded-full bg-purple-600 text-white flex items-center justify-center text-[10px]">
+                          {i + 1}
+                        </span>
+                        {skill}
+                      </span>
+
+                      {i <
+                        Math.min((match.missingSkills || []).length, 3) - 1 && (
+                        <span className="text-slate-500">→</span>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              <button className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold px-5 py-3 rounded-xl text-xs shadow-lg shadow-purple-600/30 hover:opacity-95 transition flex items-center gap-2 shrink-0 cursor-pointer">
+              <button
+                onClick={() => navigate("/dashboard")}
+                className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold px-5 py-3 rounded-xl text-xs shadow-lg shadow-purple-600/30 hover:opacity-95 transition flex items-center gap-2 shrink-0 cursor-pointer"
+              >
                 Start Learning Path <FiArrowRight />
               </button>
             </div>
