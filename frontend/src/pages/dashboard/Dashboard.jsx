@@ -10,7 +10,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-
 import {
   FiCode,
   FiBookOpen,
@@ -73,6 +72,7 @@ export default function Dashboard() {
 
   const [recentApplications, setRecentApplications] = useState([]);
   const [matchScore, setMatchScore] = useState(0);
+  const [matchData, setMatchData] = useState(null);
 
   const loadDashboard = useCallback(async () => {
     try {
@@ -111,16 +111,19 @@ export default function Dashboard() {
       const jobs = topJobsRes.data || [];
       setTopJobs(jobs);
 
-      // Dynamic AI Match Score (logged-in user's first recommended job)
       if (jobs.length > 0) {
         try {
           const matchRes = await matchingApi.getJobMatch(jobs[0].id);
+
+          setMatchData(matchRes.data);
           setMatchScore(Math.round(matchRes.data.matchPercentage ?? 0));
         } catch (error) {
           console.error("Failed to load match score:", error);
+          setMatchData(null);
           setMatchScore(0);
         }
       } else {
+        setMatchData(null);
         setMatchScore(0);
       }
 
@@ -444,7 +447,7 @@ export default function Dashboard() {
             text="Complete more sections for better recommendations."
           />
 
-          <MatchScoreCard score={matchScore} />
+          <MatchScoreCard score={matchScore} matchData={matchData} />
         </div>
 
         {/* 4. Quick Actions */}
