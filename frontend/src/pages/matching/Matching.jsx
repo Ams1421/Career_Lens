@@ -11,7 +11,7 @@ import {
   FiTrendingUp,
 } from "react-icons/fi";
 import { matchingApi } from "../../api/matching";
-import { jobApi } from "../../api/jobs";
+import { jobsApi } from "../../api/jobs";
 import Sidebar from "../../components/layout/Sidebar";
 import TopNavbar from "../../components/layout/TopNavbar";
 import { dashboardApi } from "../../api/dashboard";
@@ -41,7 +41,7 @@ export default function Matching() {
       setProfile(profileRes.data);
 
       // Load all jobs for the right-side list
-      const jobsRes = await jobApi.getJobs();
+      const jobsRes = await jobsApi.getJobs();
       const jobs = jobsRes.data || [];
       setTopJobs(jobs);
 
@@ -52,6 +52,10 @@ export default function Matching() {
 
       // Open selected job or first job
       const selectedJobId = jobId || jobs[0].id;
+
+      if (!jobId) {
+        navigate(`/matching/${selectedJobId}`, { replace: true });
+      }
 
       const matchRes = await matchingApi.getJobMatch(selectedJobId);
 
@@ -270,7 +274,7 @@ export default function Matching() {
                   </h2>
                 </div>
                 <button
-                  onClick={() => navigate("/browse-jobs")}
+                  onClick={() => navigate("/jobs")}
                   className="text-xs text-purple-400 font-semibold hover:underline flex items-center gap-1 cursor-pointer"
                 >
                   View All →
